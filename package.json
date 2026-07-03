@@ -1,6 +1,6 @@
 {
     "name": "sourcelib",
-    "version": "0.2.0",
+    "version": "0.3.1",
     "description": "Library for interfacing with source engine files",
     "repository": {
         "type": "git",

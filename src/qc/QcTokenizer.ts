@@ -1,4 +1,4 @@
-import { SharedTokenizer } from "../_shared/SharedTokenizer";
+import { SharedTokenizer } from "../_shared/SharedTokenizer.js";
 
 export const QcTokenizer = {
     tokenizeText(text: string): QcToken[] {

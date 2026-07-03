@@ -1,5 +1,5 @@
-import { QcCommand, QcCommandContent, QcDocument } from "./QcCommands";
-import { QcToken, QcTokenizer, QcTokenTypes } from "./QcTokenizer";
+import { QcCommand, QcCommandContent, QcDocument } from "./QcCommands.js";
+import { QcToken, QcTokenizer, QcTokenTypes } from "./QcTokenizer.js";
 
 export const QcParser = {
     parseText(text: string): QcDocument {

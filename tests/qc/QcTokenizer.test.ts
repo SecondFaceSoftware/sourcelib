@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { QcToken, QcTokenizer, QcTokenTypes } from "../../src/qc/QcTokenizer";
+import { QcTokenizer, QcTokenTypes } from "../../src/qc/QcTokenizer";
 
 test("Tokenize static prop QC", () => {
     const tokens = QcTokenizer.tokenizeText(`

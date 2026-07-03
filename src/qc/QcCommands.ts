@@ -1,6 +1,9 @@
+import { QcToken } from "./QcTokenizer";
+
 export interface QcCommandContent {
     command: QcCommand;
-    content: string;
+    commandToken: QcToken;
+    content: QcToken[];
 }
 
 export interface QcDocument {

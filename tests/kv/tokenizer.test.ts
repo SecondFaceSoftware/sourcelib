@@ -1,6 +1,7 @@
-import { test, expect } from "vitest";
-import { consumeStringUnquoted, KvTokenizer } from "../../src/kv/KvTokenizer";
+import { expect, test } from "vitest";
+import { KvTokenizer } from "../../src/kv/KvTokenizer";
 import { TokenType } from "../../src/kv/KvParser";
+import { SharedTokenizer } from "../../src/_shared/SharedTokenizer";
 
 test("Tokenize Simple KV", () => {
     const tokens = KvTokenizer.tokenize(
@@ -223,11 +224,11 @@ test("Tokenize conditionals on object", () => {
 
 test("Consume Unquoted string", () => {
     let text = "hello_this_is_an_unquoted_string";
-    expect(consumeStringUnquoted(text, 0)).toBe(text.length + 1);
+    expect(SharedTokenizer.consumeStringUnquoted(text, 0)).toBe(text.length + 1);
 
     text = "key value";
-    expect(consumeStringUnquoted(text, 0)).toBe(4);
-    expect(consumeStringUnquoted(text, 4)).toBe(6);
+    expect(SharedTokenizer.consumeStringUnquoted(text, 0)).toBe(4);
+    expect(SharedTokenizer.consumeStringUnquoted(text, 4)).toBe(6);
 });
 
 // To fix https://github.com/source-lib/sourcelib/issues/1

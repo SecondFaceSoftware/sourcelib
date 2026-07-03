@@ -1,5 +1,5 @@
-import { KvStringUtil } from "./KvStringUtil.js";
-import { TokenList, TokenType, Token, Range } from "./KvParser.js";
+import { Range, Token, TokenList, TokenType } from "./KvParser.js";
+import { SharedTokenizer } from "../_shared/SharedTokenizer";
 
 const preprocessorRegex = /#(base|include)/;
 
@@ -37,7 +37,7 @@ function _tokenizeInternal(text: string): TokenList {
 
         // Is it a comment?
         if (c === "/" && text[i + 1] === "/") {
-            const commentLength = consumeComment(text, i + 2);
+            const commentLength = SharedTokenizer.consumeComment(text, i + 2);
             tokenList.push(
                 new Token(
                     TokenType.Comment,
@@ -78,7 +78,7 @@ function _tokenizeInternal(text: string): TokenList {
         }
 
         // No, it's a string!
-        const stringLength = consumeString(text, i);
+        const stringLength = SharedTokenizer.consumeString(text, i);
         const stringContent = text.substring(i, i + stringLength);
         let tokenType = expectingKey ? TokenType.Key : TokenType.Value;
 
@@ -98,18 +98,6 @@ function _tokenizeInternal(text: string): TokenList {
     return tokenList;
 }
 
-export function consumeComment(text: string, i: number): number {
-    let n = 1;
-    let c = text[i];
-    for (; c != null; c = text[i + n++]) {
-        if (c === "\n" || c === "\r") {
-            break;
-        }
-    }
-
-    return n + 1;
-}
-
 export function consumeConditional(text: string, i: number): number {
     let n = 1;
     let c = text[i];
@@ -119,49 +107,4 @@ export function consumeConditional(text: string, i: number): number {
         }
     }
     return n;
-}
-
-export function consumeString(text: string, i: number): number {
-    const c = text[i];
-
-    // Is it quoted?
-    if (c === '"' || c === "'") {
-        return consumeStringQuoted(text, i + 1, c);
-    } else {
-        return consumeStringUnquoted(text, i + 1);
-    }
-}
-
-export function consumeStringQuoted(text: string, i: number, startingQuote: string): number {
-    let n = 1;
-    let escaped = false;
-    let c = text[i];
-    for (; c != null; c = text[i + n++]) {
-        if (c === "\n") {
-            return n;
-        }
-        if (c === "\\") {
-            escaped = !escaped;
-            continue;
-        }
-
-        if (c === startingQuote) {
-            if (escaped) {
-                escaped = false;
-                continue;
-            } else {
-                break;
-            }
-        } else {
-            if (escaped) escaped = false;
-        }
-    }
-
-    return n + 1;
-}
-
-export function consumeStringUnquoted(text: string, i: number): number {
-    let n = 0;
-    for (; i + n < text.length && !KvStringUtil.isWhitespace(text[i + n]); n++);
-    return n + 1;
 }

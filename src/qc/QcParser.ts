@@ -1,4 +1,10 @@
-import { QcCommand, QcCommandContent, QcDocument } from "./QcCommands.js";
+import {
+    QcCommand,
+    QcCommandContent,
+    QcCommandContext,
+    QcCommandToParseFunctionMap,
+    QcDocument,
+} from "./QcCommands.js";
 import { QcToken, QcTokenizer, QcTokenTypes } from "./QcTokenizer.js";
 
 export const QcParser = {
@@ -14,7 +20,7 @@ export const QcParser = {
 
         let command: QcCommand | undefined = undefined;
         let commandToken: QcToken | undefined = undefined;
-        let content: QcToken[] = [];
+        let contentTokens: QcToken[] = [];
 
         for (const qcToken of qcTokens) {
             if (qcToken.type === QcTokenTypes.ScopeStart) {
@@ -23,10 +29,15 @@ export const QcParser = {
                 scope--;
             } else if (qcToken.type === QcTokenTypes.Command && scope === 0) {
                 if (command && commandToken) {
-                    resultCommands.push({ command, commandToken, content });
+                    resultCommands.push({
+                        command,
+                        commandToken,
+                        contentTokens,
+                        content: _parseCommandContent(command, contentTokens),
+                    });
                     command = undefined;
                     commandToken = undefined;
-                    content = [];
+                    contentTokens = [];
                 }
 
                 if (knownCmds.includes(qcToken.value)) {
@@ -43,14 +54,23 @@ export const QcParser = {
                 scope > 0 ? qcToken.type !== QcTokenTypes.Comment : qcToken.type >= QcTokenTypes.Literal;
 
             if (command && shouldPushToCommand) {
-                content.push(qcToken);
+                contentTokens.push(qcToken);
             }
         }
 
         if (command && commandToken) {
-            resultCommands.push({ command, commandToken, content });
+            resultCommands.push({
+                command,
+                commandToken,
+                contentTokens,
+                content: _parseCommandContent(command, contentTokens),
+            });
         }
 
         return { commands: resultCommands };
     },
 };
+
+function _parseCommandContent(cmd: QcCommand, tokens: QcToken[]): QcCommandContext | undefined {
+    return QcCommandToParseFunctionMap[cmd](tokens);
+}

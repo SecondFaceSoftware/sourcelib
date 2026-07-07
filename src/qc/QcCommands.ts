@@ -1,6 +1,7 @@
 import { QcToken } from "./QcTokenizer";
 import { parseSequence, QcCommandContext_Sequence } from "./commands/QcCmd_Sequence";
 import { parseBody, QcCommandContext_Body } from "./commands/QcCmd_Body";
+import { parseCollisionModel, QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel";
 
 export type QcCommandContext = object;
 
@@ -169,8 +170,8 @@ export type QcCommandToContextMap = {
     [QcCommand.WorldAlign]: QcCommandContext;
     [QcCommand.KeepUpright]: QcCommandContext;
     [QcCommand.Model]: QcCommandContext;
-    [QcCommand.CollisionModel]: QcCommandContext;
-    [QcCommand.CollisionJoints]: QcCommandContext;
+    [QcCommand.CollisionModel]: QcCommandContext_CollisionModel;
+    [QcCommand.CollisionJoints]: QcCommandContext_CollisionModel;
     [QcCommand.CollisionText]: QcCommandContext;
     [QcCommand.AppendSource]: QcCommandContext;
     [QcCommand.Body]: QcCommandContext_Body;
@@ -306,8 +307,8 @@ export const QcCommandToParseFunctionMap: Record<QcCommand, QcCommandParseFunc> 
     [QcCommand.WorldAlign]: nothingFunc,
     [QcCommand.KeepUpright]: nothingFunc,
     [QcCommand.Model]: nothingFunc,
-    [QcCommand.CollisionModel]: nothingFunc,
-    [QcCommand.CollisionJoints]: nothingFunc,
+    [QcCommand.CollisionModel]: parseCollisionModel,
+    [QcCommand.CollisionJoints]: parseCollisionModel,
     [QcCommand.CollisionText]: nothingFunc,
     [QcCommand.AppendSource]: nothingFunc,
     [QcCommand.Body]: parseBody,

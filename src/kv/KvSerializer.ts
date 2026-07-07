@@ -1,4 +1,4 @@
-import { Document, Item, Literal } from "./KvParser.js";
+import { Document, Item, KvParser, Literal } from "./KvParser.js";
 import { KvStringUtil } from "./KvStringUtil.js";
 
 type KvNodeValue = string | number | boolean;
@@ -56,6 +56,10 @@ export const KvSerializer = {
 
         const fullStr = kvLines.join("\n");
         return fullStr;
+    },
+
+    deserializeText(text: string, options?: KvDeserializeOptions): KvNode[] {
+        return KvSerializer.deserialize(KvParser.parseText(text), options);
     },
 
     deserialize(doc: Document, options?: KvDeserializeOptions): KvNode[] {

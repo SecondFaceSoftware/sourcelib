@@ -1,6 +1,6 @@
-import { QcCommandContext } from "../QcCommands";
-import { QcToken } from "../QcTokenizer";
-import { QcCmdParserContext } from "./QcCmdParsers";
+import { QcCommandContext } from "../QcCommands.js";
+import { QcToken } from "../QcTokenizer.js";
+import { QcCmdParserContext } from "./QcCmdParsers.js";
 
 export interface QcCommandContext_Sequence extends QcCommandContext {
     name: string;

@@ -16,7 +16,8 @@
         "test": "vitest ./tests",
         "lint": "eslint src",
         "lint-fix": "eslint src --fix",
-        "bench": "vitest bench ./tests"
+        "bench": "vitest bench ./tests",
+        "check": "tsc -p ./src --noEmit"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",

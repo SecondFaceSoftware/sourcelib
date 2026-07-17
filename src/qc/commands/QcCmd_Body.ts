@@ -1,6 +1,6 @@
-import { QcCommandContext } from "../QcCommands";
-import { QcToken, QcTokenTypes } from "../QcTokenizer";
-import { QcCmdParserContext } from "./QcCmdParsers";
+import { QcCommandContext } from "../QcCommands.js";
+import { QcToken, QcTokenTypes } from "../QcTokenizer.js";
+import { QcCmdParserContext } from "./QcCmdParsers.js";
 
 export interface QcCommandContext_Body extends QcCommandContext {
     skinName: string;

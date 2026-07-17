@@ -1,4 +1,4 @@
-import { KvStringUtil } from "../kv/KvStringUtil";
+import { KvStringUtil } from "../kv/KvStringUtil.js";
 
 export const SharedTokenizer = {
     consumeComment(text: string, i: number): number {

@@ -1,5 +1,5 @@
-import { QcToken, QcTokenTypes } from "../QcTokenizer";
-import { KvStringUtil } from "../../kv/KvStringUtil";
+import { QcToken, QcTokenTypes } from "../QcTokenizer.js";
+import { KvStringUtil } from "../../kv/KvStringUtil.js";
 
 export class QcCmdParserContext {
     pos = -1;

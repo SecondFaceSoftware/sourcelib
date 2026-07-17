@@ -1,5 +1,5 @@
 import { Range, Token, TokenList, TokenType } from "./KvParser.js";
-import { SharedTokenizer } from "../_shared/SharedTokenizer";
+import { SharedTokenizer } from "../_shared/SharedTokenizer.js";
 
 const preprocessorRegex = /#(base|include)/;
 

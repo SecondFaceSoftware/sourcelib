@@ -1,7 +1,7 @@
-import { QcCommand, QcDocument } from "./QcCommands";
-import { QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel";
-import { QcCommandContext_Body } from "./commands/QcCmd_Body";
-import { QcCommandContext_Sequence } from "./commands/QcCmd_Sequence";
+import { QcCommand, QcDocument } from "./QcCommands.js";
+import { QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
+import { QcCommandContext_Body } from "./commands/QcCmd_Body.js";
+import { QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
 
 export const QcUtils = {
     /**

@@ -1,7 +1,7 @@
-import { QcToken } from "./QcTokenizer";
-import { parseSequence, QcCommandContext_Sequence } from "./commands/QcCmd_Sequence";
-import { parseBody, QcCommandContext_Body } from "./commands/QcCmd_Body";
-import { parseCollisionModel, QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel";
+import { QcToken } from "./QcTokenizer.js";
+import { parseSequence, QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
+import { parseBody, QcCommandContext_Body } from "./commands/QcCmd_Body.js";
+import { parseCollisionModel, QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
 
 export type QcCommandContext = object;
 

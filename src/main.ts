@@ -1,5 +1,5 @@
 import * as captions from "./captions/main.js";
-import * as fs from "./fs/SourceFs";
+import * as fs from "./fs/SourceFs.js";
 import * as kv from "./kv/main.js";
 import * as vmt from "./vmt/main.js";
 import * as qc from "./qc/main.js";

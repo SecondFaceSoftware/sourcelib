@@ -12,6 +12,16 @@ export interface QcCommandContext_Sequence extends QcCommandContext {
     references: string[];
 
     snap?: boolean;
+    loop?: boolean;
+    hidden?: boolean;
+    noAnimation?: boolean;
+    autoplay?: boolean;
+    worldSpace?: boolean;
+    worldSpaceBlend?: boolean;
+    worldRelative?: boolean;
+    realTime?: boolean;
+
+    frames?: { start: number; end: number };
 }
 
 export function parseSequence(tokens: QcToken[]): QcCommandContext_Sequence | undefined {
@@ -33,6 +43,30 @@ export function parseSequence(tokens: QcToken[]): QcCommandContext_Sequence | un
 
         if (str === "snap") {
             result.snap = true;
+        } else if (str === "loop") {
+            result.loop = true;
+        } else if (str === "hidden") {
+            result.hidden = true;
+        } else if (str === "noanimation") {
+            result.noAnimation = true;
+        } else if (str === "autoplay") {
+            result.autoplay = true;
+        } else if (str === "worldspace") {
+            result.worldSpace = true;
+        } else if (str === "worldspaceblend") {
+            result.worldSpaceBlend = true;
+        } else if (str === "worldrelative") {
+            result.worldRelative = true;
+        } else if (str === "realtime") {
+            result.realTime = true;
+        } else if (str === "frames" || str === "frame") {
+            c.nextToken();
+            const start = c.getTokenInt();
+            c.nextToken();
+            const end = c.getTokenInt();
+            if (start !== undefined && end !== undefined) {
+                result.frames = { start, end };
+            }
         } else if (str) {
             result.references.push(str);
         }

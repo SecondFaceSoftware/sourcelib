@@ -3,5 +3,6 @@ import * as fs from "./fs/SourceFs.js";
 import * as kv from "./kv/main.js";
 import * as vmt from "./vmt/main.js";
 import * as qc from "./qc/main.js";
+import * as shared from "./_shared/main.js";
 
-export { captions, fs, kv, vmt, qc };
+export { captions, fs, kv, vmt, qc, shared };

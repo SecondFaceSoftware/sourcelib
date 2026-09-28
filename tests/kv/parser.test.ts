@@ -1,5 +1,5 @@
 import { test, expect, describe } from "vitest";
-import { KvParser, ParseErrorType } from "../../src/kv/KvParser";
+import { KvParser, KvParseErrorType } from "../../src/kv/KvParser";
 
 describe("Parse Successes", () => {
     test("Parse Simple", () => {
@@ -279,13 +279,13 @@ describe("Parse Errors", () => {
         expect(kvTree.getErrors().length).toBe(2);
 
         const err1 = kvTree.getErrors()[0];
-        expect(err1.type).toBe(ParseErrorType.MissingRootObject);
+        expect(err1.type).toBe(KvParseErrorType.MissingRootObject);
         expect(err1.position.getLine()).toBe(0);
         expect(err1.position.getRange().getStart()).toBe(0);
         expect(err1.position.getRange().getEnd()).toBe(13);
 
         const err2 = kvTree.getErrors()[1];
-        expect(err2.type).toBe(ParseErrorType.MissingRootObject);
+        expect(err2.type).toBe(KvParseErrorType.MissingRootObject);
         expect(err2.position.getLine()).toBe(6);
         expect(err2.position.getRange().getStart()).toBe(0);
         expect(err2.position.getRange().getEnd()).toBe(15);
@@ -324,11 +324,11 @@ describe("Parse Errors", () => {
         expect(item3.getValues()!.length).toBe(1);
 
         const errors = kvTree.getErrors();
-        expect(errors[0].type).toBe(ParseErrorType.MissingValue);
+        expect(errors[0].type).toBe(KvParseErrorType.MissingValue);
         expect(errors[0].position.getLine()).toBe(1);
         expect(errors[0].position.getRange().getStart()).toBe(4);
         expect(errors[0].position.getRange().getEnd()).toBe(8);
-        expect(errors[1].type).toBe(ParseErrorType.MissingValue);
+        expect(errors[1].type).toBe(KvParseErrorType.MissingValue);
         expect(errors[1].position.getLine()).toBe(2);
         expect(errors[1].position.getRange().getStart()).toBe(4);
         expect(errors[1].position.getRange().getEnd()).toBe(8);
@@ -345,7 +345,7 @@ describe("Parse Errors", () => {
         expect(kvTree.getRootItems().length).toBe(1);
         expect(kvTree.getErrors().length).toBe(1);
         const err = kvTree.getErrors()[0];
-        expect(err.type).toBe(ParseErrorType.UnexpectedOpeningBrace);
+        expect(err.type).toBe(KvParseErrorType.UnexpectedOpeningBrace);
         expect(err.position.getLine()).toBe(1);
         expect(err.position.getRange().getStart()).toBe(4);
         expect(err.position.getRange().getEnd()).toBe(5);
@@ -361,7 +361,7 @@ describe("Parse Errors", () => {
         expect(kvTree.getRootItems().length).toBe(1);
         expect(kvTree.getErrors().length).toBe(1);
         const err = kvTree.getErrors()[0];
-        expect(err.type).toBe(ParseErrorType.UnexpectedClosingBrace);
+        expect(err.type).toBe(KvParseErrorType.UnexpectedClosingBrace);
         expect(err.position.getLine()).toBe(3);
         expect(err.position.getRange().getStart()).toBe(0);
         expect(err.position.getRange().getEnd()).toBe(1);

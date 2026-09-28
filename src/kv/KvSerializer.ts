@@ -1,10 +1,10 @@
-import { Document, Item, KvParser, Literal } from "./KvParser.js";
+import { KvDocument, KvItem, KvParser, KvLiteral } from "./KvParser.js";
 import { KvStringUtil } from "./KvStringUtil.js";
 
-type KvNodeValue = string | number | boolean;
-type KvNodeRecord = { [key: string]: KvNodeValue | KvNodeValue[] | KvNode };
-type KvNodeArray = (KvNode | KvNodeValue)[];
-type KvNode = KvNodeRecord | KvNodeArray;
+export type KvNodeValue = string | number | boolean;
+export type KvNodeRecord = { [key: string]: KvNodeValue | KvNodeValue[] | KvNode };
+export type KvNodeArray = (KvNode | KvNodeValue)[];
+export type KvNode = KvNodeRecord | KvNodeArray;
 
 export interface KvSerializeOptions {
     name?: string;
@@ -62,7 +62,7 @@ export const KvSerializer = {
         return KvSerializer.deserialize(KvParser.parseText(text), options);
     },
 
-    deserialize(doc: Document, options?: KvDeserializeOptions): KvNode[] {
+    deserialize(doc: KvDocument, options?: KvDeserializeOptions): KvNode[] {
         const nodes = doc
             .getRootItems()
             .map(_deserializeItem)
@@ -74,7 +74,7 @@ export const KvSerializer = {
     },
 };
 
-function _deserializeItem(item: Item): KvNode | undefined {
+function _deserializeItem(item: KvItem): KvNode | undefined {
     const children = item.getChildren();
     if (!children) {
         return;
@@ -103,7 +103,7 @@ function _deserializeItem(item: Item): KvNode | undefined {
     return node;
 }
 
-function _deserializeItemValue(vals: Literal[]): KvNodeValue | KvNodeValue[] | undefined {
+function _deserializeItemValue(vals: KvLiteral[]): KvNodeValue | KvNodeValue[] | undefined {
     if (vals.length === 1) {
         return _transformKvValue(vals[0].getUnquotedContent());
     } else {

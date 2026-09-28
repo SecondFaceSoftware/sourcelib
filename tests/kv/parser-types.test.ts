@@ -1,60 +1,61 @@
 import { test, expect, describe } from "vitest";
-import { Range, Literal, Item, Position } from "../../src/kv/KvParser";
+import { KvLiteral, KvItem } from "../../src/kv/KvParser";
+import { ParserPosition, ParserRange } from "../../src/_shared/SharedParser";
 
-describe("Range", () => {
+describe("ParserRange", () => {
     test("Construct valid Success", () => {
         expect(() => {
-            new Range(1, 2);
+            new ParserRange(1, 2);
         }).not.toThrow();
     });
     test("Construct less than zero start Fail", () => {
         expect(() => {
-            new Range(-1, 2);
+            new ParserRange(-1, 2);
         }).toThrowError();
     });
     test("Construct end less than start Fail", () => {
         expect(() => {
-            new Range(3, 2);
+            new ParserRange(3, 2);
         }).toThrowError();
     });
     test("Construct float start Fail", () => {
         expect(() => {
-            new Range(3.3, 2);
+            new ParserRange(3.3, 2);
         }).toThrowError();
     });
     test("Construct float end Fail", () => {
         expect(() => {
-            new Range(1, 2.4);
+            new ParserRange(1, 2.4);
         }).toThrowError();
     });
 
-    test("Range intersecting Success", () => {
-        const range1 = new Range(0, 5);
-        const range2 = new Range(3, 10);
-        expect(range1.isIntersecting(range2)).toBe(true);
-        expect(range2.isIntersecting(range1)).toBe(true);
+    test("ParserRange intersecting Success", () => {
+        const ParserRange1 = new ParserRange(0, 5);
+        const ParserRange2 = new ParserRange(3, 10);
+        expect(ParserRange1.isIntersecting(ParserRange2)).toBe(true);
+        expect(ParserRange2.isIntersecting(ParserRange1)).toBe(true);
     });
 
-    test("Range intersecting Fail", () => {
-        const range1 = new Range(0, 5);
-        const range2 = new Range(6, 10);
-        expect(range1.isIntersecting(range2)).toBe(false);
-        expect(range2.isIntersecting(range1)).toBe(false);
+    test("ParserRange intersecting Fail", () => {
+        const ParserRange1 = new ParserRange(0, 5);
+        const ParserRange2 = new ParserRange(6, 10);
+        expect(ParserRange1.isIntersecting(ParserRange2)).toBe(false);
+        expect(ParserRange2.isIntersecting(ParserRange1)).toBe(false);
     });
 
     test("Item create leaf Success", () => {
-        const key = new Literal(new Position(0, new Range(0, 5)), "item1");
-        const values = [new Literal(new Position(0, new Range(6, 10)), "value1")];
-        const item1 = Item.createLeaf(null, key, values);
+        const key = new KvLiteral(new ParserPosition(0, new ParserRange(0, 5)), "item1");
+        const values = [new KvLiteral(new ParserPosition(0, new ParserRange(6, 10)), "value1")];
+        const item1 = KvItem.createLeaf(null, key, values);
         expect(item1.isLeaf()).toBe(true);
         expect(item1.getValues()).toEqual(values);
         expect(item1.getKey().getContent()).toBe("item1");
     });
 });
 
-describe("Literal", () => {
-    test("Literal getUnquoted Success", () => {
-        const literal = new Literal(new Position(0, new Range(0, 6)), '"TEST"');
+describe("KvLiteral", () => {
+    test("KvLiteral getUnquoted Success", () => {
+        const literal = new KvLiteral(new ParserPosition(0, new ParserRange(0, 6)), '"TEST"');
         const literalContent = literal.asUnquoted();
 
         // Ensure that original literal didn't mutate
@@ -69,14 +70,14 @@ describe("Literal", () => {
         expect(literalContent.getPosition().getRange().getEnd()).toBe(5);
     });
 
-    test("Literal isValid Success", () => {
-        const literal = new Literal(new Position(1, new Range(3, 10)), "Success");
+    test("KvLiteral isValid Success", () => {
+        const literal = new KvLiteral(new ParserPosition(1, new ParserRange(3, 10)), "Success");
 
         expect(literal.isValid()).toBe(true);
     });
 
-    test("Literal isValid Fail", () => {
-        const literal = new Literal(new Position(1, new Range(3, 11)), "Success");
+    test("KvLiteral isValid Fail", () => {
+        const literal = new KvLiteral(new ParserPosition(1, new ParserRange(3, 11)), "Success");
 
         expect(literal.isValid()).toBe(false);
     });

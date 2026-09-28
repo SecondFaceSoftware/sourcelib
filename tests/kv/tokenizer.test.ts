@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { KvTokenizer } from "../../src/kv/KvTokenizer";
-import { TokenType } from "../../src/kv/KvParser";
+import { KvTokenType } from "../../src/kv/KvParser";
 import { SharedTokenizer } from "../../src/_shared/SharedTokenizer";
 
 test("Tokenize Simple KV", () => {
@@ -52,40 +52,40 @@ test("Tokenize Simple KV", () => {
     expect(tokens.length).toBe(53);
 
     expect(tokens[0].value).toBe('"File"');
-    expect(tokens[0].type).toBe(TokenType.Key);
+    expect(tokens[0].type).toBe(KvTokenType.Key);
     expect(tokens[0].line).toBe(0);
     expect(tokens[0].range.getStart()).toBe(0);
     expect(tokens[0].range.getEnd()).toBe(6);
     expect(tokens[1].value).toBe("{");
-    expect(tokens[1].type).toBe(TokenType.ObjectStart);
+    expect(tokens[1].type).toBe(KvTokenType.ObjectStart);
     expect(tokens[1].line).toBe(1);
     expect(tokens[1].range.getStart()).toBe(0);
     expect(tokens[1].range.getEnd()).toBe(1);
     expect(tokens[2].value).toBe('"Keyvalues"');
-    expect(tokens[2].type).toBe(TokenType.Key);
+    expect(tokens[2].type).toBe(KvTokenType.Key);
     expect(tokens[2].line).toBe(2);
     expect(tokens[2].range.getStart()).toBe(4);
     expect(tokens[2].range.getEnd()).toBe(15);
     expect(tokens[3].value).toBe("{");
-    expect(tokens[3].type).toBe(TokenType.ObjectStart);
+    expect(tokens[3].type).toBe(KvTokenType.ObjectStart);
     expect(tokens[3].line).toBe(2);
     expect(tokens[3].range.getStart()).toBe(16);
     expect(tokens[3].range.getEnd()).toBe(17);
     expect(tokens[4].value).toBe("// A comment");
-    expect(tokens[4].type).toBe(TokenType.Comment);
+    expect(tokens[4].type).toBe(KvTokenType.Comment);
     expect(tokens[4].line).toBe(4);
     expect(tokens[4].range.getStart()).toBe(8);
     expect(tokens[4].range.getEnd()).toBe(20);
     expect(tokens[5].value).toBe('"Quoted Strings"');
     expect(tokens[5].line).toBe(6);
-    expect(tokens[5].type).toBe(TokenType.Key);
+    expect(tokens[5].type).toBe(KvTokenType.Key);
     expect(tokens[6].value).toBe('"a a"');
     expect(tokens[6].line).toBe(6);
-    expect(tokens[6].type).toBe(TokenType.Value);
+    expect(tokens[6].type).toBe(KvTokenType.Value);
     expect(tokens[7].value).toBe("// Comment after the line");
     expect(tokens[7].line).toBe(6);
 
-    expect(tokens[50].type).toBe(TokenType.Value);
+    expect(tokens[50].type).toBe(KvTokenType.Value);
     expect(tokens[50].value).toBe('"\\"world\\""');
 });
 
@@ -101,16 +101,16 @@ test("Tokenize preprocessor", () => {
     }`);
 
     expect(tokens.length).toBe(10);
-    expect(tokens[0].type).toBe(TokenType.Comment);
-    expect(tokens[1].type).toBe(TokenType.PreprocessorKey);
-    expect(tokens[2].type).toBe(TokenType.Value);
-    expect(tokens[3].type).toBe(TokenType.Key);
-    expect(tokens[4].type).toBe(TokenType.ObjectStart);
-    expect(tokens[5].type).toBe(TokenType.PreprocessorKey);
-    expect(tokens[6].type).toBe(TokenType.Value);
-    expect(tokens[7].type).toBe(TokenType.Key);
-    expect(tokens[8].type).toBe(TokenType.Value);
-    expect(tokens[9].type).toBe(TokenType.ObjectEnd);
+    expect(tokens[0].type).toBe(KvTokenType.Comment);
+    expect(tokens[1].type).toBe(KvTokenType.PreprocessorKey);
+    expect(tokens[2].type).toBe(KvTokenType.Value);
+    expect(tokens[3].type).toBe(KvTokenType.Key);
+    expect(tokens[4].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[5].type).toBe(KvTokenType.PreprocessorKey);
+    expect(tokens[6].type).toBe(KvTokenType.Value);
+    expect(tokens[7].type).toBe(KvTokenType.Key);
+    expect(tokens[8].type).toBe(KvTokenType.Value);
+    expect(tokens[9].type).toBe(KvTokenType.ObjectEnd);
 });
 
 test("Tokenize missing closing quote on string", () => {
@@ -125,27 +125,27 @@ test("Tokenize missing closing quote on string", () => {
     }`);
 
     expect(tokens.length).toBe(12);
-    expect(tokens[2].type).toBe(TokenType.Key);
+    expect(tokens[2].type).toBe(KvTokenType.Key);
     expect(tokens[2].value).toBe('"key1"');
-    expect(tokens[3].type).toBe(TokenType.Value);
+    expect(tokens[3].type).toBe(KvTokenType.Value);
     expect(tokens[3].value).toBe("value1");
 
-    expect(tokens[4].type).toBe(TokenType.Key);
+    expect(tokens[4].type).toBe(KvTokenType.Key);
     expect(tokens[4].value).toBe('"key2"');
-    expect(tokens[5].type).toBe(TokenType.Value);
+    expect(tokens[5].type).toBe(KvTokenType.Value);
     expect(tokens[5].value).toBe('"value2');
 
-    expect(tokens[6].type).toBe(TokenType.Key);
+    expect(tokens[6].type).toBe(KvTokenType.Key);
     expect(tokens[6].value).toBe('"key3"');
-    expect(tokens[7].type).toBe(TokenType.Value);
+    expect(tokens[7].type).toBe(KvTokenType.Value);
     expect(tokens[7].value).toBe('value3"');
 
-    expect(tokens[8].type).toBe(TokenType.Key);
+    expect(tokens[8].type).toBe(KvTokenType.Key);
     expect(tokens[8].value).toBe('"key4 value4');
 
-    expect(tokens[9].type).toBe(TokenType.Key);
+    expect(tokens[9].type).toBe(KvTokenType.Key);
     expect(tokens[9].value).toBe("key5");
-    expect(tokens[10].type).toBe(TokenType.Value);
+    expect(tokens[10].type).toBe(KvTokenType.Value);
     expect(tokens[10].value).toBe("value5");
 });
 
@@ -155,16 +155,16 @@ test("Tokenize multiple values", () => {
     }`);
 
     expect(tokens.length).toBe(9);
-    expect(tokens[0].type).toBe(TokenType.Key);
-    expect(tokens[1].type).toBe(TokenType.ObjectStart);
-    expect(tokens[2].type).toBe(TokenType.Key);
-    expect(tokens[3].type).toBe(TokenType.Value);
+    expect(tokens[0].type).toBe(KvTokenType.Key);
+    expect(tokens[1].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[2].type).toBe(KvTokenType.Key);
+    expect(tokens[3].type).toBe(KvTokenType.Value);
     expect(tokens[3].value).toBe('"v1"');
-    expect(tokens[4].type).toBe(TokenType.Value);
+    expect(tokens[4].type).toBe(KvTokenType.Value);
     expect(tokens[4].value).toBe("v2");
-    expect(tokens[5].type).toBe(TokenType.Value);
+    expect(tokens[5].type).toBe(KvTokenType.Value);
     expect(tokens[5].value).toBe("v3");
-    expect(tokens[6].type).toBe(TokenType.Value);
+    expect(tokens[6].type).toBe(KvTokenType.Value);
     expect(tokens[6].value).toBe("4");
 });
 
@@ -175,16 +175,16 @@ test("Tokenize conditionals", () => {
     }`);
 
     expect(tokens.length).toBe(9);
-    expect(tokens[0].type).toBe(TokenType.Key);
-    expect(tokens[1].type).toBe(TokenType.ObjectStart);
-    expect(tokens[2].type).toBe(TokenType.Key);
-    expect(tokens[3].type).toBe(TokenType.Value);
-    expect(tokens[4].type).toBe(TokenType.Conditional);
+    expect(tokens[0].type).toBe(KvTokenType.Key);
+    expect(tokens[1].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[2].type).toBe(KvTokenType.Key);
+    expect(tokens[3].type).toBe(KvTokenType.Value);
+    expect(tokens[4].type).toBe(KvTokenType.Conditional);
     expect(tokens[4].value).toBe("[$TEST]");
-    expect(tokens[5].type).toBe(TokenType.Key);
+    expect(tokens[5].type).toBe(KvTokenType.Key);
     expect(tokens[5].value).toBe('"k2"');
-    expect(tokens[6].type).toBe(TokenType.Value);
-    expect(tokens[7].type).toBe(TokenType.Conditional);
+    expect(tokens[6].type).toBe(KvTokenType.Value);
+    expect(tokens[7].type).toBe(KvTokenType.Conditional);
     expect(tokens[7].value).toBe("[ $TEST && ( !$DEBUG ) ]");
 });
 
@@ -203,23 +203,23 @@ test("Tokenize conditionals on object", () => {
     }`);
 
     expect(tokens.length).toBe(17);
-    expect(tokens[0].type).toBe(TokenType.Key);
-    expect(tokens[1].type).toBe(TokenType.ObjectStart);
-    expect(tokens[2].type).toBe(TokenType.Key);
-    expect(tokens[3].type).toBe(TokenType.Value);
-    expect(tokens[4].type).toBe(TokenType.Key);
-    expect(tokens[5].type).toBe(TokenType.Conditional);
-    expect(tokens[6].type).toBe(TokenType.ObjectStart);
-    expect(tokens[7].type).toBe(TokenType.Key);
-    expect(tokens[8].type).toBe(TokenType.Value);
-    expect(tokens[9].type).toBe(TokenType.ObjectEnd);
-    expect(tokens[10].type).toBe(TokenType.Key);
-    expect(tokens[11].type).toBe(TokenType.Conditional);
-    expect(tokens[12].type).toBe(TokenType.ObjectStart);
-    expect(tokens[13].type).toBe(TokenType.Key);
-    expect(tokens[14].type).toBe(TokenType.Value);
-    expect(tokens[15].type).toBe(TokenType.ObjectEnd);
-    expect(tokens[16].type).toBe(TokenType.ObjectEnd);
+    expect(tokens[0].type).toBe(KvTokenType.Key);
+    expect(tokens[1].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[2].type).toBe(KvTokenType.Key);
+    expect(tokens[3].type).toBe(KvTokenType.Value);
+    expect(tokens[4].type).toBe(KvTokenType.Key);
+    expect(tokens[5].type).toBe(KvTokenType.Conditional);
+    expect(tokens[6].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[7].type).toBe(KvTokenType.Key);
+    expect(tokens[8].type).toBe(KvTokenType.Value);
+    expect(tokens[9].type).toBe(KvTokenType.ObjectEnd);
+    expect(tokens[10].type).toBe(KvTokenType.Key);
+    expect(tokens[11].type).toBe(KvTokenType.Conditional);
+    expect(tokens[12].type).toBe(KvTokenType.ObjectStart);
+    expect(tokens[13].type).toBe(KvTokenType.Key);
+    expect(tokens[14].type).toBe(KvTokenType.Value);
+    expect(tokens[15].type).toBe(KvTokenType.ObjectEnd);
+    expect(tokens[16].type).toBe(KvTokenType.ObjectEnd);
 });
 
 test("Consume Unquoted string", () => {

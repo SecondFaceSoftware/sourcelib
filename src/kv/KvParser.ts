@@ -1,7 +1,8 @@
 import { KvTokenizer } from "./KvTokenizer.js";
 import { KvStringUtil } from "./KvStringUtil.js";
+import { ParserPosition, ParserRange } from "../_shared/SharedParser.js";
 
-export enum TokenType {
+export enum KvTokenType {
     Comment,
     Key,
     Value,
@@ -11,57 +12,57 @@ export enum TokenType {
     Conditional,
 }
 
-export class Token {
-    type: TokenType;
-    range: Range;
+export class KvToken {
+    type: KvTokenType;
+    range: ParserRange;
     value: string;
     line: number;
 
-    constructor(type: TokenType, range: Range, value: string, line: number) {
+    constructor(type: KvTokenType, range: ParserRange, value: string, line: number) {
         this.type = type;
         this.range = range;
         this.value = value;
         this.line = line;
     }
 
-    public toLiteral(): Literal {
-        return new Literal(this.getPosition(), this.value);
+    public toLiteral(): KvLiteral {
+        return new KvLiteral(this.getPosition(), this.value);
     }
 
-    public getPosition(): Position {
-        return new Position(this.line, this.range);
+    public getPosition(): ParserPosition {
+        return new ParserPosition(this.line, this.range);
     }
 
-    public toConditional(): Conditional {
-        return new Conditional(this.getPosition(), this.value);
-    }
-}
-
-export class TokenList extends Array<Token> {
-    public static create(tokens: Token[]): TokenList {
-        return new TokenList(...tokens);
-    }
-
-    public getAllOnLine(line: number): TokenList {
-        return TokenList.create(this.filter((t) => t.line == line));
-    }
-
-    public getAllOfType(type: TokenType): TokenList {
-        return TokenList.create(this.filter((t) => t.type == type));
+    public toConditional(): KvConditional {
+        return new KvConditional(this.getPosition(), this.value);
     }
 }
 
-export class ParseError {
-    public type: ParseErrorType;
-    public position: Position;
+export class KvTokenList extends Array<KvToken> {
+    public static create(tokens: KvToken[]): KvTokenList {
+        return new KvTokenList(...tokens);
+    }
 
-    constructor(type: ParseErrorType, position: Position) {
+    public getAllOnLine(line: number): KvTokenList {
+        return KvTokenList.create(this.filter((t) => t.line == line));
+    }
+
+    public getAllOfType(type: KvTokenType): KvTokenList {
+        return KvTokenList.create(this.filter((t) => t.type == type));
+    }
+}
+
+export class KvParseError {
+    public type: KvParseErrorType;
+    public position: ParserPosition;
+
+    constructor(type: KvParseErrorType, position: ParserPosition) {
         this.type = type;
         this.position = position;
     }
 }
 
-export enum ParseErrorType {
+export enum KvParseErrorType {
     MissingValue,
     MissingKey,
     MissingClosingBrace,
@@ -70,153 +71,11 @@ export enum ParseErrorType {
     MissingRootObject,
 }
 
-export class Range {
-    private start: number;
-    private end: number;
-
-    constructor(start: number, end: number) {
-        if (start < 0) {
-            throw new RangeError("Start must not be less than zero");
-        }
-        if (end < 0) {
-            throw new RangeError("End must not be less than zero");
-        }
-        if (end < start) {
-            throw new RangeError("End must not be less than start");
-        }
-        if (!Number.isInteger(start)) {
-            throw new RangeError("Start must not be a float");
-        }
-        if (!Number.isInteger(end)) {
-            throw new RangeError("End must not be a float");
-        }
-        this.start = start;
-        this.end = end;
-    }
-
-    public copy(): Range {
-        return new Range(this.start, this.end);
-    }
-
-    public getStart(): number {
-        return this.start;
-    }
-
-    public getEnd(): number {
-        return this.end;
-    }
-
-    public moveBy(delta: number): void {
-        if (!Number.isInteger(delta)) {
-            throw new RangeError("Delta must not be a float");
-        }
-        const destStart = this.start + delta;
-        const destEnd = this.end + delta;
-
-        if (destStart < 0 || destEnd < 0) {
-            throw new RangeError("Resulting range is less than 0");
-        }
-        this.start = destStart;
-        this.end = destEnd;
-    }
-
-    public moveTo(start: number): void {
-        const prevLength = this.getLength();
-        this.start = start;
-        this.end = start + prevLength;
-    }
-
-    public moveStartTo(start: number): void {
-        this.start = start;
-    }
-
-    public moveEndTo(end: number): void {
-        this.end = end;
-    }
-
-    public moveStartBy(delta: number): void {
-        this.start += delta;
-    }
-
-    public moveEndBy(delta: number): void {
-        this.end += delta;
-    }
-
-    public isValid(): boolean {
-        return this.start < this.end;
-    }
-
-    public getLength(): number {
-        return this.end - this.start;
-    }
-
-    public isIntersecting(other: Range): boolean {
-        return this.start <= other.end && this.end >= other.start;
-    }
-}
-
-export class Position {
-    private line: number;
-    private range: Range;
-
-    constructor(line: number, range: Range) {
-        if (line < 0) {
-            throw new RangeError("Line cannot be less than zero");
-        }
-        this.line = line;
-        this.range = range;
-    }
-
-    public getLine(): number {
-        return this.line;
-    }
-
-    public getRange(): Range {
-        return this.range;
-    }
-
-    public copy(): Position {
-        return new Position(this.line, this.range);
-    }
-
-    /**
-     *
-     * @param delta Where to move the line to. Must be an unsigned int
-     * @returns Returns 'this', mutated
-     */
-    public moveToLine(line: number): Position {
-        if (!Number.isInteger(line)) {
-            throw new RangeError("Line must not be float");
-        }
-        if (line < 0) {
-            throw new RangeError("Line cannot be less than zero");
-        }
-        this.line = line;
-        return this;
-    }
-
-    /**
-     *
-     * @param delta Amount of lines to move forward (down). Must be an int. Clamps at 0
-     * @returns Returns 'this', mutated
-     */
-    public moveLineBy(delta: number): Position {
-        if (!Number.isInteger(delta)) {
-            throw new RangeError("Delta must not be float");
-        }
-        const dest = this.line - delta;
-        if (dest < 0) {
-            throw new RangeError("The resulting line number cannot be less than zero.");
-        }
-        return this;
-    }
-}
-
-export class Literal {
-    private position: Position;
+export class KvLiteral {
+    private position: ParserPosition;
     private content: string;
 
-    constructor(position: Position, content: string) {
+    constructor(position: ParserPosition, content: string) {
         this.position = position;
         this.content = content;
     }
@@ -225,7 +84,7 @@ export class Literal {
         return KvStringUtil.isQuoted(this.content);
     }
 
-    public getPosition(): Position {
+    public getPosition(): ParserPosition {
         return this.position;
     }
 
@@ -239,38 +98,38 @@ export class Literal {
         return this.content;
     }
 
-    public asUnquoted(): Literal {
+    public asUnquoted(): KvLiteral {
         if (!this.isQuoted()) return this;
 
         const newContent = KvStringUtil.stripQuotes(this.getContent());
         const newRange = this.getPosition().getRange().copy();
         newRange.moveStartBy(1);
         newRange.moveEndBy(-1);
-        const newPosition = new Position(this.getPosition()!.getLine(), newRange);
-        return new Literal(newPosition, newContent);
+        const newPosition = new ParserPosition(this.getPosition()!.getLine(), newRange);
+        return new KvLiteral(newPosition, newContent);
     }
 
     public isValid(): boolean {
         return this.getContent().length === this.getPosition().getRange().getLength();
     }
 
-    public copy(): Literal {
-        return new Literal(this.position, this.content);
+    public copy(): KvLiteral {
+        return new KvLiteral(this.position, this.content);
     }
 }
 
-export class Conditional extends Literal {}
+export class KvConditional extends KvLiteral {}
 
-export class Item {
-    private parent: Item | null;
-    private key: Literal;
-    private children: Item[] | null;
-    private values: Literal[] | null;
-    private condition: Conditional | null;
-    private openingBrace: Literal | null;
-    private closingBrace: Literal | null;
+export class KvItem {
+    private parent: KvItem | null;
+    private key: KvLiteral;
+    private children: KvItem[] | null;
+    private values: KvLiteral[] | null;
+    private condition: KvConditional | null;
+    private openingBrace: KvLiteral | null;
+    private closingBrace: KvLiteral | null;
 
-    private constructor(key: Literal, parent: Item | null, condition: Conditional | null) {
+    private constructor(key: KvLiteral, parent: KvItem | null, condition: KvConditional | null) {
         this.key = key;
         this.children = null;
         this.values = null;
@@ -281,29 +140,29 @@ export class Item {
     }
 
     public static createLeaf(
-        parent: Item | null,
-        key: Literal,
-        value: Literal[],
-        condition: Conditional | null = null,
-    ): Item {
-        const item = new Item(key, parent, condition);
+        parent: KvItem | null,
+        key: KvLiteral,
+        value: KvLiteral[],
+        condition: KvConditional | null = null,
+    ): KvItem {
+        const item = new KvItem(key, parent, condition);
         item.values = value;
         return item;
     }
 
     public static createContainer(
-        parent: Item | null,
-        key: Literal,
-        children: Item[],
-        condition: Conditional | null = null,
-    ): Item {
-        const item = new Item(key, parent, condition);
+        parent: KvItem | null,
+        key: KvLiteral,
+        children: KvItem[],
+        condition: KvConditional | null = null,
+    ): KvItem {
+        const item = new KvItem(key, parent, condition);
         item.children = children;
         return item;
     }
 
-    public copy(): Item {
-        const item = new Item(this.key, this.parent, this.condition);
+    public copy(): KvItem {
+        const item = new KvItem(this.key, this.parent, this.condition);
         item.values = this.values;
         item.children = this.children;
         return item;
@@ -313,30 +172,30 @@ export class Item {
         return this.children == null && this.values != null;
     }
 
-    public getValues(): Literal[] | null {
+    public getValues(): KvLiteral[] | null {
         return this.values;
     }
 
-    public getChildren(): Item[] | null {
+    public getChildren(): KvItem[] | null {
         return this.children;
     }
 
-    public getKey(): Literal {
+    public getKey(): KvLiteral {
         return this.key;
     }
 
-    public addChild(child: Item): void {
+    public addChild(child: KvItem): void {
         if (this.children == null) {
             this.children = [];
         }
         this.children.push(child);
     }
 
-    public replaceChildren(children: Item[]): void {
+    public replaceChildren(children: KvItem[]): void {
         this.children = children;
     }
 
-    public getParent(): Item | null {
+    public getParent(): KvItem | null {
         return this.parent;
     }
 
@@ -344,7 +203,7 @@ export class Item {
         return this.parent == null;
     }
 
-    public getCondition(): Conditional | null {
+    public getCondition(): KvConditional | null {
         return this.condition;
     }
 
@@ -352,37 +211,37 @@ export class Item {
         return this.condition != null;
     }
 
-    public startPopulatingContainer(openingBrace: Literal): void {
+    public startPopulatingContainer(openingBrace: KvLiteral): void {
         this.openingBrace = openingBrace;
     }
 
-    public endPopulatingContainer(closingBrace: Literal): void {
+    public endPopulatingContainer(closingBrace: KvLiteral): void {
         this.closingBrace = closingBrace;
     }
 
-    public getOpeningBrace(): Literal | null {
+    public getOpeningBrace(): KvLiteral | null {
         return this.openingBrace;
     }
 
-    public getClosingBrace(): Literal | null {
+    public getClosingBrace(): KvLiteral | null {
         return this.closingBrace;
     }
 }
 
-export class Document {
-    private rootItems: Item[];
-    private errors: ParseError[];
+export class KvDocument {
+    private rootItems: KvItem[];
+    private errors: KvParseError[];
 
-    public constructor(rootItems: Item[], errors: ParseError[]) {
+    public constructor(rootItems: KvItem[], errors: KvParseError[]) {
         this.rootItems = rootItems;
         this.errors = errors;
     }
 
-    public getRootItems(): Item[] {
+    public getRootItems(): KvItem[] {
         return this.rootItems;
     }
 
-    public getErrors(): ParseError[] {
+    public getErrors(): KvParseError[] {
         return this.errors;
     }
 
@@ -391,51 +250,51 @@ export class Document {
     }
 }
 
-interface ParserState {
-    currentParent: Item | null;
-    keyToken: Token | null;
-    valueTokens: Token[];
-    conditionToken: Token | null;
+interface KvParserState {
+    currentParent: KvItem | null;
+    keyToken: KvToken | null;
+    valueTokens: KvToken[];
+    conditionToken: KvToken | null;
 
-    errors: Array<ParseError>;
-    roots: Array<Item>;
+    errors: Array<KvParseError>;
+    roots: Array<KvItem>;
 }
 
 export const KvParser = {
-    parseText(text: string): Document {
+    parseText(text: string): KvDocument {
         const tokens = KvTokenizer.tokenize(text);
         const document = _parseTokensInternal(tokens);
         return document;
     },
-    parseTokens(tokens: TokenList): Document {
+    parseTokens(tokens: KvTokenList): KvDocument {
         return _parseTokensInternal(tokens);
     },
 };
 
-export function _parseTokensInternal(tokens: TokenList): Document {
+export function _parseTokensInternal(tokens: KvTokenList): KvDocument {
     const state = {
         conditionToken: null,
         currentParent: null,
         keyToken: null,
         valueTokens: [],
-        errors: new Array<ParseError>(),
-        roots: new Array<Item>(),
-    } as ParserState;
+        errors: new Array<KvParseError>(),
+        roots: new Array<KvItem>(),
+    } as KvParserState;
 
     for (const token of tokens) {
         // Ignore comments
-        if (token.type === TokenType.Comment) continue;
+        if (token.type === KvTokenType.Comment) continue;
 
         // KV set is done
         completeOutstandingKvSet(state, token);
 
-        if (token.type === TokenType.Key) {
+        if (token.type === KvTokenType.Key) {
             state.keyToken = token;
             state.valueTokens = [];
             continue;
         }
 
-        if (token.type === TokenType.Value) {
+        if (token.type === KvTokenType.Value) {
             if (state.keyToken == null) {
                 // This should never happen, but just in case.
                 continue;
@@ -445,15 +304,15 @@ export function _parseTokensInternal(tokens: TokenList): Document {
             continue;
         }
 
-        if (token.type === TokenType.ObjectStart) {
+        if (token.type === KvTokenType.ObjectStart) {
             if (state.keyToken == null) {
-                const error = new ParseError(ParseErrorType.UnexpectedOpeningBrace, token.getPosition());
+                const error = new KvParseError(KvParseErrorType.UnexpectedOpeningBrace, token.getPosition());
                 state.errors.push(error);
                 continue;
             }
             const key = state.keyToken.toLiteral();
-            const condition: Conditional | undefined = state.conditionToken?.toConditional();
-            const item = Item.createContainer(state.currentParent, key, [], condition);
+            const condition: KvConditional | undefined = state.conditionToken?.toConditional();
+            const item = KvItem.createContainer(state.currentParent, key, [], condition);
             item.startPopulatingContainer(token.toLiteral());
 
             if (state.currentParent == null) {
@@ -469,9 +328,9 @@ export function _parseTokensInternal(tokens: TokenList): Document {
             continue;
         }
 
-        if (token.type === TokenType.ObjectEnd) {
+        if (token.type === KvTokenType.ObjectEnd) {
             if (state.currentParent == null) {
-                const error = new ParseError(ParseErrorType.UnexpectedClosingBrace, token.getPosition());
+                const error = new KvParseError(KvParseErrorType.UnexpectedClosingBrace, token.getPosition());
                 state.errors.push(error);
             } else {
                 state.currentParent.endPopulatingContainer(token.toLiteral());
@@ -481,7 +340,7 @@ export function _parseTokensInternal(tokens: TokenList): Document {
             continue;
         }
 
-        if (token.type === TokenType.Conditional) {
+        if (token.type === KvTokenType.Conditional) {
             state.conditionToken = token;
             continue;
         }
@@ -491,15 +350,15 @@ export function _parseTokensInternal(tokens: TokenList): Document {
         if (state.currentParent == null) {
             const pos = getKvSetPosition(state);
             if (pos != null) {
-                state.errors.push(new ParseError(ParseErrorType.MissingRootObject, pos));
+                state.errors.push(new KvParseError(KvParseErrorType.MissingRootObject, pos));
             }
         }
     }
 
-    return new Document(state.roots, state.errors);
+    return new KvDocument(state.roots, state.errors);
 }
 
-function getKvSetPosition(s: ParserState): Position | null {
+function getKvSetPosition(s: KvParserState): ParserPosition | null {
     if (s.keyToken == null) return null;
     let end: number;
 
@@ -509,28 +368,28 @@ function getKvSetPosition(s: ParserState): Position | null {
         end = s.keyToken.range.getEnd();
     }
 
-    const range = new Range(s.keyToken.range.getStart(), end);
-    return new Position(s.keyToken.line, range);
+    const range = new ParserRange(s.keyToken.range.getStart(), end);
+    return new ParserPosition(s.keyToken.line, range);
 }
 
-function completeOutstandingKvSet(s: ParserState, token: Token): void {
-    if (s.keyToken == null || s.keyToken.line === token.line || token.type === TokenType.ObjectStart) return;
+function completeOutstandingKvSet(s: KvParserState, token: KvToken): void {
+    if (s.keyToken == null || s.keyToken.line === token.line || token.type === KvTokenType.ObjectStart) return;
 
     if (s.valueTokens.length == 0) {
-        const error = new ParseError(ParseErrorType.MissingValue, s.keyToken.getPosition());
+        const error = new KvParseError(KvParseErrorType.MissingValue, s.keyToken.getPosition());
         s.errors.push(error);
     }
 
     if (s.currentParent == null) {
         const pos = getKvSetPosition(s);
         if (pos != null) {
-            s.errors.push(new ParseError(ParseErrorType.MissingRootObject, pos));
+            s.errors.push(new KvParseError(KvParseErrorType.MissingRootObject, pos));
         }
     } else {
         const key = s.keyToken.toLiteral();
-        const values = s.valueTokens.map((t) => new Literal(new Position(t.line, t.range), t.value));
-        const condition: Conditional | undefined = s.conditionToken?.toConditional();
-        const item = Item.createLeaf(s.currentParent, key, values, condition);
+        const values = s.valueTokens.map((t) => new KvLiteral(new ParserPosition(t.line, t.range), t.value));
+        const condition: KvConditional | undefined = s.conditionToken?.toConditional();
+        const item = KvItem.createLeaf(s.currentParent, key, values, condition);
         s.currentParent.addChild(item);
     }
 

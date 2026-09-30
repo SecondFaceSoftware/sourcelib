@@ -16,4 +16,5 @@ export const VmtMatrix = {
             values: vals,
         };
     },
+    getMatrixRegExp() { return matrixRegExp; }
 };

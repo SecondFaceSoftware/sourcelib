@@ -2,6 +2,7 @@ import { QcCommand, QcDocument } from "./QcCommands.js";
 import { QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
 import { QcCommandContext_Body } from "./commands/QcCmd_Body.js";
 import { QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
+import { QcCommandContext_ModelName } from "./commands/QcCmd_ModelName";
 
 export const QcUtils = {
     /**
@@ -30,5 +31,18 @@ export const QcUtils = {
         }
 
         return refs;
+    },
+
+    /** Get the value of $modelname */
+    getModelName(qcDocument: QcDocument): string | undefined {
+        for (const cmd of qcDocument.commands) {
+            if (cmd.command === QcCommand.ModelName) {
+                const content = cmd.content as QcCommandContext_ModelName | undefined;
+                if (!content) return undefined;
+                return content.file;
+            }
+        }
+
+        return undefined;
     },
 };

@@ -2,6 +2,7 @@ import { QcToken } from "./QcTokenizer.js";
 import { parseSequence, QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
 import { parseBody, QcCommandContext_Body } from "./commands/QcCmd_Body.js";
 import { parseCollisionModel, QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
+import { parseModelName, QcCommandContext_ModelName } from "./commands/QcCmd_ModelName";
 
 export type QcCommandContext = object;
 
@@ -158,7 +159,7 @@ export enum QcCommand {
 
 export type QcCommandToContextMap = {
     [QcCommand.Cd]: QcCommandContext;
-    [QcCommand.ModelName]: QcCommandContext;
+    [QcCommand.ModelName]: QcCommandContext_ModelName;
     [QcCommand.InternalName]: QcCommandContext;
     [QcCommand.CdMaterials]: QcCommandContext;
     [QcCommand.PushD]: QcCommandContext;
@@ -295,7 +296,7 @@ export type QcCommandParseFunc = (tokens: QcToken[]) => QcCommandContext | undef
 const nothingFunc = (tokens: QcToken[]) => undefined;
 export const QcCommandToParseFunctionMap: Record<QcCommand, QcCommandParseFunc> = {
     [QcCommand.Cd]: nothingFunc,
-    [QcCommand.ModelName]: nothingFunc,
+    [QcCommand.ModelName]: parseModelName,
     [QcCommand.InternalName]: nothingFunc,
     [QcCommand.CdMaterials]: nothingFunc,
     [QcCommand.PushD]: nothingFunc,

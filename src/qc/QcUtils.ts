@@ -2,7 +2,7 @@ import { QcCommand, QcDocument } from "./QcCommands.js";
 import { QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
 import { QcCommandContext_Body } from "./commands/QcCmd_Body.js";
 import { QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
-import { QcCommandContext_ModelName } from "./commands/QcCmd_ModelName";
+import { QcCommandContext_ModelName } from "./commands/QcCmd_ModelName.js";
 
 export const QcUtils = {
     /**

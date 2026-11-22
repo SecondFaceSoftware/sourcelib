@@ -2,7 +2,7 @@ import { QcToken } from "./QcTokenizer.js";
 import { parseSequence, QcCommandContext_Sequence } from "./commands/QcCmd_Sequence.js";
 import { parseBody, QcCommandContext_Body } from "./commands/QcCmd_Body.js";
 import { parseCollisionModel, QcCommandContext_CollisionModel } from "./commands/QcCmd_CollisionModel.js";
-import { parseModelName, QcCommandContext_ModelName } from "./commands/QcCmd_ModelName";
+import { parseModelName, QcCommandContext_ModelName } from "./commands/QcCmd_ModelName.js";
 
 export type QcCommandContext = object;
 

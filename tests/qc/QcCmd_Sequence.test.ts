@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
-import { QcParser } from "../../src/qc/QcParser";
-import { QcCommand } from "../../src/qc/QcCommands";
-import { QcCommandContext_Sequence } from "../../src/qc/commands/QcCmd_Sequence";
+import { QcParser } from "../../src/qc/QcParser.js";
+import { QcCommand } from "../../src/qc/QcCommands.js";
+import { QcCommandContext_Sequence } from "../../src/qc/commands/QcCmd_Sequence.js";
 
 test("Qc Command $sequence - simple", () => {
     const doc = QcParser.parseText(`$sequence "idle" "idle.smd"`);

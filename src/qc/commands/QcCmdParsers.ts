@@ -17,13 +17,21 @@ export class QcCmdParserContext {
             return undefined;
         }
     }
+    unGetToken(): void {
+        this.pos--;
+    }
     getToken(): QcToken | undefined {
         return this.pos < this.tokens.length ? this.tokens[this.pos] : undefined;
     }
     getTokenString(): string | undefined {
         const t = this.getToken();
-        if (t && (t.type === QcTokenTypes.Literal || t.type === QcTokenTypes.Command)) {
+        if (!t) return undefined;
+        if (t.type === QcTokenTypes.Literal || t.type === QcTokenTypes.Command) {
             return KvStringUtil.stripQuotes(t.value);
+        } else if (t.type === QcTokenTypes.ScopeStart) {
+            return "{";
+        } else if (t.type === QcTokenTypes.ScopeEnd) {
+            return "}";
         } else {
             return undefined;
         }
